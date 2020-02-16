@@ -1,0 +1,45 @@
+Today myself, and 3 friends went to an all day ML Engineering hosted by Chicago ML. We met with Garrett Smith, founder of Guild AI (https://guild.ai/).
+
+The first half was very entertaining. Garrett has a software engineering background for some 30+ years from the way it sounds like. His approach to MLEngineering is to have a twist of software engineering methodologies tied in. He figures since things like source control, CI-CD, issue tracking, test driven development, iterations/sprints, and code reviews have worked so well when creating software that we should make an effort to apply it to MLEngineering.
+
+He starts by defining ML Engineering as ‘..the application of software and systems engineering practices to data science.’
+
+Traditionally the way data science code is written and explored is within a Jupyter Notebook. For those that don’t know, a Jupyter Notebook is an interactive python runtime. You write and execute code as the state of your application is running. It’s as if you have a debugger running with breakpoints on each line of a .NET app, that you get to write new code in the following lines, that will get executed when you choose. You’re coding in a frozen state of the application, molding it at will.
+
+Imagine if that same application were to crash. Locally no problem, you’d just restart it, but in a production environment that wouldn’t fly for the .NET app, so why should it fly for data science.
+
+The Jupyter Notebook is great and essential for exploratory data analysis, and experimenting with simple models. He says that as you write code that works in the notebook, transfer it to a python module, and import that same python module within the notebook, and continue. That way you can write tests around the code you’re pulling out, and it’ll then be available to you for other experiments as well.
+
+I found that extremely enlightening and am slightly ashamed I didn’t think of that myself. I’ve started new notebooks and essentially copied code again and again from older notebooks. That statement was eye-opening.
+
+He quotes a blog-post by Radek Osmulski, ‘How to do machine learning efficiently.’ (https://hackernoon.com/doing-machine-learning-efficiently-8ba9d9bc679d)
+
+“Do not ever allow calculations to exceed 10 seconds while you work on a problem.”
+
+That’s initially sounds crazy right? We’re working with big data? Even loading the data can take a minute or two, what’s he smoking? Radek goes on to rebuttal that, “All it takes is to subset your data in a way that can create a representative sample. This can be done for any domain and in most cases requires nothing more than randomly choosing some percentage of examples to work with.”
+
+I’ll add in the xkcd reference for compiling, holds true for EDA for MLEs. (https://xkcd.com/303/). “My model's training.” If we follow the 10 second rule and use subsets for EDA, then we can quickly continue iterating over our code. Of course the final solution would run against the entire dataset, but while training that doesn’t need to be the case.
+
+He asks us to keep these things in mind as the ‘Big Picture’ for ML Engineering.
+
+"How do we measure success? How do we know when we’re done? How do we know when we’re going backwards?"
+
+Our goals should be to measure our success, maintain quality, and improve performance. This should follow the methodology of being systematic, repeatable, and explainable.
+
+The second half got pretty technical and hands on. I grouped up with my friends and we used a dataset that one of them acquired from work. A list of 800 patients (de-identified), with about 10 independent variables, and one dependent variable. The premise of the data was that these 800 patients had a surgery called Microdecompression, and that a % of them required a second surgery. We proposed that we could determine features of the patient that could predict whether a patient would need a second surgery. (Spoiler: We couldn’t. We got to 44% precision on predicting True for second surgery, worse than a coin flip. There was too much data missing.)
+
+I did get a chance to hop up to the front of the audience and present our code and findings at the end of the day, which was super awesome. I’ll clean up the code and show it off soon, it’s nothing amazing. It was essentially a mini-hack-a-thon of code stitched together in 3 hours. What was cool was the tool itself we used to record our experiments.
+
+If Data Science is a Science, and we’re running experiments, then we need to record our different attempts at experiments. Guild AI sits on top of your python code allowing you to input ranges of hyper parameters for your model tuning, and record the outcome of a single score.
+
+In my case I ran the following (which I learned later didn’t need to be entered on the command line, but in a yaml file in the root directory for easier reading.)
+
+guild run train.py learning_rate=‘[0.01,0.2]’ max_depth=‘[5:15]’ min_sample_split=‘[2:10]’ n_estimators=‘[50,100,150,250,350,500,750]’ test_split=‘[0.2,0.4,0.5,0.3]’ --maximize precision_score --max-trials 200
+
+This line says run Guild for train.py (my model), use all possible combinations of all the variables that I am passing in, and what’s most important, attempt to optimize the precision_score (outputted by train.py). Guild saves all runs of each combination, and it’s logs and score. Under the hood it does a uni-variate optimization algorithm to determine the best possible combination of hyper tuning parameters to use for that particular score. It has its own mini-webserver for viewing runs, also hooks into Tensorboard, and outputs fancy charts in HiPlot.
+
+I got the tour today and drank the koolaid for why it’s useful. I am also happy about learning how to apply software engineering methodologies to data science, and meeting more folks to talk to. Overall today was nerdtastically awesome.
+
+If you want to take a look at Guild, here is the quick start link: https://guild.ai/docs/start/
+
+If you have any questions, please hit me up. I'd be happy to chat.
